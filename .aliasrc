@@ -1,0 +1,36 @@
+#! /bin/sh
+
+alias ls='ls --color=auto'
+alias la='ls -A'
+alias ll='ls -lh'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias d='du -h --max-depth=1 | sort -h'
+
+alias launch_agent='eval `ssh-agent`; ssh-add'
+alias rdk='rdesktop -u simaticj -d LDTIMA.IMAG.FR -k fr -g 1266x768 wtstima-1.imag.fr'
+alias kill_skype='kill -9 $(ps -e | grep skype | cut -d" " -f2)'
+
+alias texcompile='latexmk -pdf -shell-escape *.tex'
+alias texclean='latexmk -c; rm -rf *.run.xml *.nav *.snm dot _minted-top *.bbl figures/gen/*.* figures/gen/*/*; find . -name **~ -exec rm {} \;'
+
+# Arch aliases
+alias xlock='i3lock -c 000000 -e'
+#alias jabref='jabref -s'
+alias netsw='sudo netctl switch-to'
+alias netcut="sudo ip link set wlp2s0 down"
+
+#alias emacs='emacsclient -t'
+alias e='emacsclient -t'
+alias remacs='/usr/bin/emacs --daemon; e'
+
+# I don't know how to type
+alias eamcs='emacs'
+alias snv='svn'
+
+alias gs="gst"
+alias vpy3="pushd ~/$WORK_GIT/; source activate_python3_venv; popd"
+alias vpy2="pushd ~/$WORK_GIT/; source activate_python2_venv; popd"
+
+alias config='/usr/bin/git --git-dir=$HOME/.myconfigs/ --work-tree=$HOME'

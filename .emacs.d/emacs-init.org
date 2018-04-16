@@ -1,0 +1,577 @@
+#+TITLE:  Emacs Configuration File
+#+AUTHOR: Jean Simatic (adapted from Marie)
+#+EMAIL:  jean@simatic.org
+#+OPTIONS: toc:3 num:nil ^:nil
+
+* About
+This configuration is to be used with the following =init.el= :
+#+begin_example
+  ;; init.el for this setup. Must use Emacs 24
+  (org-babel-load-file
+  (expand-file-name "emacs-init.org"
+                   user-emacs-directory))
+#+end_example
+* Initialisation des dépots de package & use-package
+** Ajout de melpa, marmalade & gnu
+
+#+BEGIN_SRC emacs-lisp
+(require 'package)
+(setq package-enable-at-startup nil)
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
+(package-initialize)
+#+END_SRC
+
+** Initialisation de use-package
+Use-package est un ensemble de macro permettant de manager comme un boss ses
+plugins. Outre d'obliger à correctement présenter son code, les macros ajoutent
+des auto-load etc. qui permettent des meilleures performances.
+
+[[https://github.com/jwiegley/use-package][Documentation sur le dépot Github du projet]] !
+
+#+BEGIN_SRC emacs-lisp
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package)
+  (package-install 'diminish))
+
+(eval-when-compile
+  (require 'use-package))
+(require 'diminish)
+#+END_SRC
+
+* Basic sane settings
+** reload config easyly
+#+BEGIN_SRC emacs-lisp
+(defun reload-config ()
+  "Reload configuration"
+  (interactive)
+  (load-file "~/.emacs.d/init.el"))
+
+(defun open-config ()
+  "Open configuration file"
+  (interactive)
+  (counsel-find-file "~/.emacs.d/emacs-init.org"))
+
+(defun zshrc ()
+  "Open ZSH configuration file"
+  (interactive)
+  (counsel-find-file "~/.zshrc"))
+#+END_SRC
+
+** Customization file
+#+BEGIN_SRC emacs-lisp
+(setq custom-file "~/.emacs.d/emacs-custom.el")
+(load-file custom-file)
+#+END_SRC
+** Misc
+#+BEGIN_SRC emacs-lisp
+; Pour ne pas avoir à taper en entier la réponse yes/no
+(fset 'yes-or-no-p 'y-or-n-p)
+
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(setq auto-revert-interval 1            ; Refresh buffers fast
+      default-input-method "TeX"        ; Use TeX when toggling input method
+      echo-keystrokes 0.1               ; Show keystrokes asap
+      inhibit-startup-message t         ; No splash screen please
+      initial-scratch-message nil       ; Clean scratch buffer
+      recentf-max-saved-items 100       ; Show more recent files
+      ring-bell-function 'ignore        ; Quiet
+      sentence-end-double-space nil)    ; No double space
+
+(dolist (mode
+         '(column-number-mode           ; Show column number in mode line
+           ; global-linum-mode                   ; Show line nummers
+           delete-selection-mode        ; Replace selected text
+           dirtrack-mode                ; directory tracking in *shell*
+           recentf-mode                 ; Recently opened files
+           show-paren-mode))            ; Highlight matching parentheses
+  (funcall mode 1))
+
+(setq-default fill-column 79                    ; Maximum line width
+              truncate-lines t                  ; Don't fold lines
+              indent-tabs-mode nil              ; Use spaces instead of tabs
+              split-width-threshold 100         ; Split verticly by default
+              )
+
+(global-set-key (kbd "²") 'dabbrev-expand)
+(global-set-key (kbd "œ") 'dabbrev-expand)
+(global-set-key (kbd "M-g") 'goto-line)
+#+END_SRC
+
+* Emacs autosaves settings
+#+BEGIN_SRC emacs-lisp
+(defvar emacs-autosave-directory
+  (concat user-emacs-directory "autosaves/")
+  "This variable dictates where to put auto saves. It is set to a
+  directory called autosaves located wherever your .emacs.d/ is
+  located.")
+
+;; Sets all files to be backed up and auto saved in a single directory.
+(setq make-backup-files t)
+(setq backup-directory-alist
+      `((".*" . ,emacs-autosave-directory))
+      auto-save-file-name-transforms
+      `((".*" ,emacs-autosave-directory t)))
+#+END_SRC
+* Misc Packages
+#+BEGIN_SRC emacs-lisp
+(use-package undo-tree
+  :ensure t
+  :diminish undo-tree-mode)
+
+;;(use-package desktop-menu
+;;  :ensure t)
+#+END_SRC
+* Editing
+** Terminal
+
+#+BEGIN_SRC emacs-lisp
+(use-package multi-term
+  :ensure t
+  :bind (("C-x M" . multi-term)
+         ("C-x µ" . switch-to-term-mode-buffer))
+  :config
+  (setq multi-term-program "/usr/bin/zsh"
+        term-buffer-maximum-size 10000)
+  ;; ;; Enable compilation-shell-minor-mode in multi term.
+  ;; ;; http://www.masteringemacs.org/articles/2012/05/29/compiling-running-scripts-emacs/
+  (add-hook 'term-mode-hook
+            (lambda ()
+              (dolist
+                  (bind '(("<M-down>" . multi-term)
+                          ("<M-left>" . multi-term-prev)
+                          ("<M-right>" . multi-term-next)
+                          ("C-<backspace>" . term-send-backward-kill-word)
+                          ("C-<delete>" . term-send-forward-kill-word)
+                          ("C-<left>" . term-send-backward-word)
+                          ("C-<right>" . term-send-forward-word)
+                          ("C-c C-j" . term-line-mode)
+                          ("C-c C-k" . term-char-mode)
+                          ("C-v" . scroll-up)
+                          ("C-y" . term-paste)
+                          ("C-z" . term-stop-subjob)
+                          ("M-DEL" . term-send-backward-kill-word)
+                          ("M-d" . term-send-forward-kill-word)))
+                (add-to-list 'term-bind-key-alist bind)))))
+#+END_SRC
+
+** Various modes -- Autoload fixing
+
+#+BEGIN_SRC emacs-lisp
+(use-package matlab
+  :load-path "~/.emacs.d/lisp"
+  :mode ("\\.m$" . matlab-mode))
+
+(use-package markdown-mode
+  :ensure t
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . markdown-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "multimarkdown"))
+
+
+(use-package anaconda-mode
+  :ensure t
+  :hook (python-mode . anaconda-mode)
+)
+
+
+(use-package paredit
+  :ensure t
+  :diminish paredit-mode
+)
+
+(use-package spice-mode
+  :ensure t
+  :mode ("\\.sp\\'" . spice-mode))
+
+(add-to-list 'auto-mode-alist '("\\.make\\'" . makefile-gmake-mode))
+(add-to-list 'auto-mode-alist '("\\.tab\\'" . (setq truncate-lines off)))
+
+(add-to-list 'auto-mode-alist '("\\.dc_shell\\'" . tcl-mode))
+(add-to-list 'auto-mode-alist '("\\.json\\'" . js-mode))
+
+(add-to-list 'auto-mode-alist '("\\.tikz\\'" . latex-mode))
+(add-to-list 'auto-mode-alist '("\\.tex\\'" . latex-mode))
+
+(use-package jedi
+  :ensure t
+  :init (setq jedi:complete-on-dot t)
+  :init (add-hook 'python-mode 'jedi:ac-setup)
+)
+  
+
+#+END_SRC
+** YASnippet
+#+BEGIN_SRC emacs-lisp
+(use-package yasnippet
+  :ensure t
+  :bind (:map yas-minor-mode-map
+              ("<tab>" . nil)
+              ("TAB" . nil)
+              ("œ" . yas-expand))
+  :config
+  (yas-reload-all)
+  (dolist (hook '(org-mode-hook
+                  fountain-mode-hook
+                  vhdl-mode-hook))
+    (add-hook hook 'yas-minor-mode)))
+#+END_SRC
+** Org mode
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :ensure t
+  :pin manual
+  :bind (("C-c l" . org-store-link)
+         ("C-x a" . org-agenda))
+  :config
+  ;; Org and writing source code inside org mode
+  (setq org-src-fontify-natively t
+        org-src-preserve-indentation t
+        org-src-tab-acts-natively t)
+  (org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(
+   (emacs-lisp . t)
+   (org . t)
+   (sh . t)
+   (C . t)
+   (python . t)
+   ))
+  ;; better bullets for titles
+  (use-package org-bullets
+    :ensure t
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+  ;; Circular bullets instead of dashes for unsorted lists
+  (font-lock-add-keywords 'org-mode
+                          '(("^ +\\([-*]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+  ;; defining directories 
+  (setq org-directory (expand-file-name "~/Documents/Notebooks"))
+  ;; defining keywords
+  (setq org-todo-keywords
+      '(
+        (sequence "IDEA(i)" "TODO(t)" "NEXT(n)" "WAITING(w)" "|" "DONE(d)")
+        ))
+  ;; C-c C-t to select the state of the todo
+  (setq org-use-fast-todo-selection t)
+  )
+#+END_SRC
+** Jupyter notebooks
+
+#+begin_src emacs-lisp
+(use-package ein
+  :ensure t
+  :config 
+  (defalias 'jupyter-start 'ein:jupyter-server-start)
+  (defalias 'jupyter-stop  'ein:jupyter-server-stop)
+  )
+#+end_src
+
+** TODO Auto-completion with company
+   =M-&=, =M-é= etc should work like =M-1= etc.
+#+BEGIN_SRC emacs-lisp
+
+(use-package company-anaconda
+  :ensure t)
+(use-package company
+  :ensure t
+  :diminish company-mode
+  :bind ("C-<tab>" . company-complete)
+  :config
+  (add-to-list 'company-backends 'company-anaconda)
+  (global-company-mode 1)
+  (setq company-idle-delay 0.3)
+  (setq company-show-numbers t)
+  (setq company-minimum-prefix-length 2)
+  (setq company-dabbrev-downcase nil)
+  (setq company-dabbrev-other-buffers t)
+  (setq company-auto-complete nil)
+  (setq company-dabbrev-code-other-buffers 'all)
+  (setq company-dabbrev-code-everywhere t)
+  (setq company-dabbrev-code-ignore-case t)
+  )
+#+END_SRC
+
+** Word processing
+*** Fountain mode
+#+BEGIN_SRC emacs-lisp
+(use-package fountain-mode
+  :ensure t
+  :commands (draft-mode))
+#+END_SRC
+*** Draft mode
+Usefull when I want to focus only on the writing.
+#+BEGIN_SRC emacs-lisp
+(use-package draft-mode
+  :ensure t
+  :commands (draft-mode))
+#+END_SRC
+* Navigation
+** Jumps
+
+#+BEGIN_SRC emacs-lisp
+(use-package smart-jump
+  :ensure t
+  :config (smart-jump-setup-default-registers)
+  :config (smart-jump-register 
+         :modes 'anaconda-mode
+         :jump-fn 'anaconda-mode-find-definitions
+         :pop-fn 'anaconda-mode-go-back
+         :refs-fn 'anaconda-mode-find-references
+         :heuristic 'point
+         :async 600))
+#+END_SRC
+
+** Project Management
+*** Projectile
+#+BEGIN_SRC emacs-lisp
+(use-package projectile
+  :ensure t
+  :diminish projectile-mode
+  :config
+  (use-package counsel-projectile
+    :ensure t
+    )
+  (projectile-mode))
+#+END_SRC
+*** Versionning
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+  :ensure t
+  :bind (("C-x g" . magit-status)))
+
+(use-package git-gutter
+  :ensure t
+  :config
+  ;; activate git gutter everywhere
+  (global-git-gutter-mode t)
+  
+  ; (git-gutter:linum-setup)
+  (custom-set-variables
+   '(git-gutter:update-interval 2)
+   '(git-gutter:lighter " GG")
+   '(git-gutter:modified-sign "  ")
+   '(git-gutter:added-sign "++")
+   '(git-gutter:deleted-sign "--")
+   '(git-gutter:hide-gutter t))     ;; Hide Gutter if there is no changes
+
+  (set-face-foreground 'git-gutter:added "green")
+  (set-face-foreground 'git-gutter:deleted "red")
+  )
+
+#+END_SRC
+** Ibuffer
+*** vc-buffer de Purcell
+#+begin_src emacs-lisp
+(use-package ibuffer-vc
+  :ensure t)
+#+end_src
+*** General settings of ibuffer
+#+BEGIN_SRC emacs-lisp
+(use-package ibuffer
+  :bind (("C-x C-b" . ibuffer)
+         ("M-i" . next-buffer)
+         ("M-o" . previous-buffer)))
+#+END_SRC
+** Window / Split management
+*** Eyebrowse
+#+BEGIN_SRC emacs-lisp
+(use-package eyebrowse
+  :ensure t
+  :config
+  (eyebrowse-mode t)
+  (eyebrowse-setup-opinionated-keys))
+#+END_SRC
+*** Acewindow
+#+BEGIN_SRC emacs-lisp
+(use-package ace-window
+  :ensure t
+  :config
+  (setq aw-dispatch-always t)
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
+#+END_SRC
+*** Enhanced search with ivy-mode (Counsel & Swiper !)
+#+BEGIN_SRC emacs-lisp
+(use-package ivy
+  :ensure t
+  :diminish ivy-mode
+  :init
+  (setq ivy-use-virtual-buffers t
+        projectil-completion-system 'ivy
+        ivy-count-format "(%d/%d) ")
+  :config
+  (ivy-mode 1)
+  :bind (("C-x C-r" . counsel-recentf)
+	 ("C-x b" . ivy-switch-buffer)
+	 ("C-c v" . ivy-push-view)
+	 ("C-c V" . ivy-pop-view)
+	 ("C-s" . counsel-grep-or-swiper)
+	 ("M-s" . swiper-all)
+	 ("M-x" . counsel-M-x)
+	 ("C-x C-t" . counsel-load-theme)
+	 ("M-a" . counsel-ag)
+	 ("M-é" . counsel-imenu)
+	 ("C-x C-f" . counsel-find-file)
+	 ("M-r" . ivy-resume)))
+#+END_SRC
+
+*** Search on steroid with Avy
+#+BEGIN_SRC emacs-lisp
+(use-package avy
+  :ensure t
+  :config
+  (setq avy-case-fold-search nil)       ;; case sensitive makes selection easier
+)
+
+#+END_SRC
+** File brower
+#+BEGIN_SRC emacs-lisp
+(use-package all-the-icons
+  :ensure t)
+
+(use-package neotree
+  :ensure t
+  :commands (neotree-toggle)
+  :config
+  ;; (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+  )
+
+#+END_SRC
+
+** IMenu list
+Because Imenu is pretty awesome to start with, having it always by my side
+can't to bad.
+#+BEGIN_SRC emacs-lisp
+(use-package sr-speedbar
+  :ensure t
+  :bind (("C-œ". sr-speedbar-toggle))
+  :config
+  (setq sr-speedbar-auto-refresh t 
+        sr-speedbar-use-images nil
+        sr-speedbar-show-unknown-files t
+        sr-speedbar-right-side nil)
+)
+#+END_SRC
+* General looking and UI tweaks
+** Font
+#+BEGIN_SRC emacs-lisp
+;;(set-face-attribute 'default nil
+;;                    :family "Source Code Pro"
+;;                    :height 110
+;;                    :weight 'normal
+;;                    :width 'normal)
+#+END_SRC
+** Theming
+Lets begin by installing some themes that I really enjoy
+#+BEGIN_SRC emacs-lisp
+
+(use-package solarized-theme
+  :ensure t
+  :init
+  (setq solarized-use-more-italic t))
+
+(use-package avk-emacs-themes
+  :ensure t)
+
+(use-package gruvbox-theme
+  :ensure t)
+#+END_SRC
+
+Package theme-looper, for easy looping throught my favorites themes.
+#+BEGIN_SRC emacs-lisp
+(use-package theme-looper
+  :ensure t
+  :config
+  (theme-looper-set-theme-set (list 'solarized-light 'solarized-dark
+				    'gruvbox 'avk-daylight)))
+#+END_SRC
+
+And finally, lets load a theme by default. (and cry that gruvbox light isn't
+yet ported on emacs.
+#+BEGIN_SRC emacs-lisp
+;; (load-theme 'gruvbox t)
+#+END_SRC
+*** moe-theme
+Un theme qui me semble plutôt cool ! à tester, du coup.
+#+BEGIN_SRC emacs-lisp
+(use-package moe-theme
+  :ensure t
+  :commands (moe-light)
+  :config
+  (setq moe-theme-resize-org-title '(1.5 1.4 1.3 1.2 1.1 1.0 1.0 1.0 1.0))
+  )
+#+END_SRC
+** TODO Help - Guide key
+   it semms that [[https://github.com/justbur/emacs-which-key][which key]] is way better ?
+#+BEGIN_SRC emacs-lisp
+(use-package guide-key
+  :defer t
+  :diminish guide-key-mode
+  :ensure t
+  :config
+  (progn
+    (setq guide-key/guide-key-sequence '("C-x r" "C-x 4" "C-c" "C-x p"))
+    (guide-key-mode 1)))  ; Enable guide-key-mode
+#+END_SRC
+** Smart mode line
+#+BEGIN_SRC emacs-lisp
+(use-package smart-mode-line
+  :ensure t
+  :init
+  (setq sml/no-confirm-load-theme t)
+  :config
+  (sml/setup))
+#+END_SRC
+** Dashboard
+#+BEGIN_SRC emacs-lisp
+(use-package dashboard
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook))
+#+END_SRC
+** Disabling GUI elements
+#+BEGIN_SRC emacs-lisp
+(dolist (mode
+         '(tool-bar-mode                ; No toolbars, more room for text
+           scroll-bar-mode              ; No scroll bars either
+           blink-cursor-mode))          ; The blinking cursor gets old
+  (funcall mode 0))
+#+END_SRC
+** Tiny Menu
+#+BEGIN_SRC emacs-lisp
+(use-package tiny-menu
+  :ensure t
+  :bind (("C-x m" . tiny-menu))
+  :config
+  (setq tiny-menu-items 
+        '(("buffer-menu"
+           ("Buffer operations"
+            ((?k "Kill" kill-this-buffer "buffer-menu")
+             (?q "Quit Menu" nil "quit"))))
+          ("projectile-menu"
+           ("Projectile"
+            ((?p "project" counsel-projectile-switch-project)
+             (?b "switch to buffer" counsel-projectile-switch-to-buffer)
+             (?f "file" counsel-projectile-find-file)
+             (?i "ibuffer" projectil-ibuffer)
+             (?d "dired" projectile-dired)
+             (?a "activate" projectile-mode))))
+          ("theme-changer"
+           ("Change theme"
+            ((?j "next theme" theme-looper-enable-next-theme "theme-changer")))))))
+#+END_SRC
+* Vrac
+** Some informations
+#+BEGIN_SRC emacs-lisp
+(set-language-environment "UTF-8")
+(setq user-full-name "Jean Simatic"
+      user-mail-address "jean@simatic.org")
+
+#+END_SRC
