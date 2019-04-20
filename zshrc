@@ -23,7 +23,7 @@ ZSH_THEME="gnzh"
 
 # Uncomment the following line to use hyphen-insensitive completion. Case
 # sensitive completion must be off. _ and - will be interchangeable.
-HYPHEN_INSENSITIVE="true"
+# HYPHEN_INSENSITIVE="true"
 
 # Uncomment the following line to disable bi-weekly auto-update checks.
 # DISABLE_AUTO_UPDATE="true"
@@ -38,7 +38,7 @@ HYPHEN_INSENSITIVE="true"
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
-#ENABLE_CORRECTION="true"
+# ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 # COMPLETION_WAITING_DOTS="true"
@@ -46,7 +46,7 @@ HYPHEN_INSENSITIVE="true"
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
 # much, much faster.
-DISABLE_UNTRACKED_FILES_DIRTY="true"
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
 
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
@@ -61,14 +61,11 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-    common-aliases
     git
-    autojump
-    gpg-agent
-    pylint
-    python
     sudo
-    screen
+    archlinux
+    ssh-agent
+    autojump
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -81,11 +78,11 @@ source $ZSH/oh-my-zsh.sh
 # export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='emacs'
-else
-  export EDITOR='emacs -nw'
-fi
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='mvim'
+# fi
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -98,25 +95,12 @@ fi
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
 #
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
 
 source .aliasrc
 
-export QSYS_ROOTDIR="/home/jsimatic/softs/intelFPGA_lite/16.1/quartus/sopc_builder/bin"
-export PL_DIR="/home/jsimatic/softs/probt-spl-3.0.0-linux64-dynamic-release/lib"
-#Arduino
-export ARDUINO_PATH=/usr/local/arduino
-export SKETCHBOOK_DIR=${HOME}/softs/Arduino
+export EDITOR='emacs -nw'
 
-#Quartus
-export PATH_ALTERA=/home/jsimatic/softs/intelFPGA/16.1
-export QUARTUS_ROOTDIR=${PATH_ALTERA}/quartus
-export QSYS_ROOTDIR=${PATH_ALTERA}/quartus/sopc_builder/bin
-export PATH=${PATH}:${PATH_ALTERA}/modelsim_ase/bin
-export PATH=${PATH}:${PATH_ALTERA}/nios2eds/bin:${PATH_ALTERA}/nios2eds/bin/gnu/H-x86_64-pc-linux-gnu/bin/
-export PATH=${PATH}:${PATH_ALTERA}/quartus/bin
-export PATH=${PATH}:${PATH_ALTERA}/embedded/host_tools/altera/preloadergen
-export PATH=${PATH}:${QSYS_ROOTDIR}
-
-export PYTHONPATH=${PYTHONPATH}:${PL_DIR}
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${PL_DIR}
-
+export PYTHONPATH=$PYTHONPATH:~/projects/pyspass:~/projects/microbayes/projects/SourceL

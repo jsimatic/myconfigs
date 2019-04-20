@@ -1,1 +1,3 @@
-*
+emacs.d
+!emacs.d/emacs-custom.el
+!emacs.d/emacs-init.org

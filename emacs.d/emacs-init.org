@@ -239,7 +239,7 @@ des auto-load etc. qui permettent des meilleures performances.
  '(
    (emacs-lisp . t)
    (org . t)
-   (sh . t)
+   (shell . t)
    (C . t)
    (python . t)
    ))

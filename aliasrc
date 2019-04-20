@@ -34,3 +34,8 @@ alias vpy3="pushd ~/$WORK_GIT/; source activate_python3_venv; popd"
 alias vpy2="pushd ~/$WORK_GIT/; source activate_python2_venv; popd"
 
 alias config='/usr/bin/git --git-dir=$HOME/.myconfigs/ --work-tree=$HOME'
+
+alias reconnect='sudo ip link set wlp2s0 down; sudo netctl restart '
+alias rmouse='sudo modprobe -r psmouse; sudo modprobe psmouse proto=imps '
+alias auei='$HOME/projects/coeur_io/linux/clavier_precedent'
+alias qsdf='$HOME/projects/coeur_io/linux/clavier_coeur_io'

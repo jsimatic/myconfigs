@@ -9,6 +9,8 @@
  ;; If there is more than one, they won't work right.
  '(ansi-color-names-vector
    ["#073642" "#dc322f" "#859900" "#b58900" "#268bd2" "#d33682" "#2aa198" "#657b83"])
+ '(blink-cursor-mode nil)
+ '(column-number-mode t)
  '(compilation-message-face (quote default))
  '(cua-global-mark-cursor-color "#2aa198")
  '(cua-normal-cursor-color "#839496")
@@ -18,7 +20,7 @@
    (quote
     ("ad109c1ad8115573f40e22ac2b996693b5d48052fa37b5919f70ea37c62a965e" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "707227acad0cf8d4db55dcf1e574b3644b68eab8aca4a8ce6635c8830bc72144" default)))
  '(fci-rule-color "#073642")
- '(fill-column 72)
+ '(fill-column 79)
  '(flyspell-default-dictionary "en")
  '(git-gutter:added-sign "++")
  '(git-gutter:deleted-sign "--")
@@ -92,10 +94,12 @@
     (ein desktop-menu multi-term w3m paredit company-anaconda anaconda-mode dumb-jump smart-jump avk-emacs-themes avk-daylight-theme tiny-menu dashboard smart-mode-line guide-key moe-theme theme-looper gruvbox-theme solarized-theme sr-speedbar neotree all-the-icons ivy ace-window eyebrowse ibuffer-vc git-gutter magit projectile draft-mode fountain-mode evil-args evil-matchit evil-surround evil-leader evil-snipe evil-escape company org-bullets yasnippet hydra use-package)))
  '(pos-tip-background-color "#073642")
  '(pos-tip-foreground-color "#93a1a1")
+ '(show-paren-mode t)
  '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#073642" 0.2))
  '(tab-width 4)
  '(term-default-bg-color "#002b36")
  '(term-default-fg-color "#839496")
+ '(tool-bar-mode nil)
  '(vc-annotate-background nil)
  '(vc-annotate-background-mode nil)
  '(vc-annotate-color-map
@@ -124,15 +128,21 @@
  '(vc-svn-global-switches (quote ("--non-interactive")))
  '(vhdl-basic-offset 2)
  '(vhdl-clock-edge-condition (quote function))
- '(vhdl-company-name "Probayes")
+ '(vhdl-company-name "HawAI.tech")
+ '(vhdl-copyright-string
+   "-------------------------------------------------------------------------------
+-- Copyright (c) <year> by <company>. This model is the confidential and
+-- proprietary property of HawAI.tech and the possession or use of this
+-- file requires a written license from <company>.
+")
  '(vhdl-file-header
    "-------------------------------------------------------------------------------
---         _____            _               _ 
---        / _  / __ _ _ __ | |__   ___   __| |
---        \\// / / _` | '_ \\| '_ \\ / _ \\ / _` |
---         / //\\ (_| | |_) | | | | (_) | (_| |
---        /____/\\__,_| .__/|_| |_|\\___/ \\__,_|
---                   |_|                      
+--            __  __               ___    ____ __            __  
+--           / / / /___ __      __/   |  /  _// /____  _____/ /_ 
+--          / /_/ / __ `/ | /| / / /| |  / / / __/ _ \\/ ___/ __ \\
+--         / __  / /_/ /| |/ |/ / ___ |_/ /_/ /_/  __/ /__/ / / /
+--        /_/ /_/\\__,_/ |__/|__/_/  |_/___(_)__/\\___/\\___/_/ /_/ 
+--                                                               
 -------------------------------------------------------------------------------
 -- Title      : <module_name string>
 -- Project    : <project>
@@ -165,5 +175,5 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(default ((((class color) (min-colors 16777215)) (:background "#282828" :foreground "#fdf4c1" :family "Bitstream Vera Sans Mono" :foundry "Bits" :slant normal :weight normal :height 98 :width normal)) (((class color) (min-colors 255)) (:background "#262626" :foreground "#ffffaf" :family "Bitstream Vera Sans Mono" :foundry "Bits" :slant normal :weight normal :height 98 :width normal)))))
 
