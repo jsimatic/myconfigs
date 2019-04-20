@@ -1,6 +1,13 @@
 # My configs
 
-Track dot files in Git. Adapted from [here](https://developer.atlassian.com/blog/2016/02/best-way-to-store-dotfiles-git-bare-repo/) and [here](https://news.ycombinator.com/item?id=11071754).
+Track dot files in Git.
+
+## TODO Auto symlinks generation
+
+## TODO Do not use symlinks
+Adapted from
+[here](https://developer.atlassian.com/blog/2016/02/best-way-to-store-dotfiles-git-bare-repo/)
+and [here](https://news.ycombinator.com/item?id=11071754).
 
 ## Replicate on new machine
 
