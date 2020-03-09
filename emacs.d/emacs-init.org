@@ -489,8 +489,8 @@ Package theme-looper, for easy looping throught my favorites themes.
 (use-package theme-looper
   :ensure t
   :config
-  (theme-looper-set-theme-set (list 'solarized-light 'solarized-dark
-				    'gruvbox 'avk-daylight)))
+  (theme-looper-set-favorite-themes '(solarized-light solarized-dark
+				    gruvbox avk-daylight)))
 #+END_SRC
 
 And finally, lets load a theme by default. (and cry that gruvbox light isn't
