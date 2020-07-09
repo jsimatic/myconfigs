@@ -1,5 +1,5 @@
 #+TITLE:  Emacs Configuration File
-#+AUTHOR: Jean Simatic (adapted from Marie)
+#+AUTHOR: Jean Simatic (adapted from Thomas)
 #+EMAIL:  jean@simatic.org
 #+OPTIONS: toc:3 num:nil ^:nil
 
@@ -480,8 +480,8 @@ Lets begin by installing some themes that I really enjoy
 (use-package avk-emacs-themes
   :ensure t)
 
-(use-package gruvbox-theme
-  :ensure t)
+;;(use-package gruvbox-theme
+;;  :ensure t)
 #+END_SRC
 
 Package theme-looper, for easy looping throught my favorites themes.
@@ -489,14 +489,13 @@ Package theme-looper, for easy looping throught my favorites themes.
 (use-package theme-looper
   :ensure t
   :config
-  (theme-looper-set-favorite-themes '(solarized-light solarized-dark
-				    gruvbox avk-daylight)))
+  (theme-looper-set-favorite-themes '(solarized-light solarized-dark avk-daylight)))
 #+END_SRC
 
 And finally, lets load a theme by default. (and cry that gruvbox light isn't
 yet ported on emacs.
 #+BEGIN_SRC emacs-lisp
-;; (load-theme 'gruvbox t)
+(load-theme 'avk-daylight t)
 #+END_SRC
 *** moe-theme
 Un theme qui me semble plutôt cool ! à tester, du coup.
