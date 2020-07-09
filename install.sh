@@ -7,6 +7,8 @@ conf_sources="i3"
 this_dir=`pwd`
 echo $this_dir
 
+sh -c "$(wget https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
+
 for f in $dot_sources
 do
     t=$HOME/.$f
