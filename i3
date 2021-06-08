@@ -171,3 +171,8 @@ bindsym $mod+r mode "resize"
 bar {
         status_command i3status
 }
+
+exec redshift-gtk
+exec nextcloud
+exec nm-applet
+exec blueman-applet
