@@ -13,6 +13,24 @@ This configuration is to be used with the following =init.el= :
                    user-emacs-directory))
 #+end_example
 
+* Startup Performance
+
+#+begin_src emacs-lisp
+
+  ;; The default is 800 kilobytes.  Measured in bytes.
+  (setq gc-cons-threshold (* 50 1000 1000))
+
+  (defun efs/display-startup-time ()
+    (message "Emacs loaded in %s with %d garbage collections."
+             (format "%.2f seconds"
+                     (float-time
+                       (time-subtract after-init-time before-init-time)))
+             gcs-done))
+
+  (add-hook 'emacs-startup-hook #'efs/display-startup-time)
+
+#+end_src
+
 * Initialisation des dépots de package & use-package
 ** Some informations
 
@@ -240,6 +258,15 @@ des auto-load etc. qui permettent des meilleures performances.
 ** Key bindings
 
 #+BEGIN_SRC emacs-lisp
+(use-package hydra
+  :defer t)
+
+(defhydra hydra-text-scale (:timeout 4)
+  "scale text"
+  ("j" text-scale-increase "in")
+  ("k" text-scale-decrease "out")
+  ("l" nil "finished" :exit t))
+
 (use-package general
   :config
   (general-create-definer jsim/leader-keys :prefix "C-x p")
@@ -253,6 +280,8 @@ des auto-load etc. qui permettent des meilleures performances.
     "pi" '(projectile-ibuffer :which-key "ibuffer")
     "pd" '(projectile-dired :which-key "dired")
     "pt" '(projectile-mode :which-key "activate")
+    "t" '(:ignore t :which-key "text")
+    "ts" '(hydra-text-scale/body :which-key "scale text")
     )
   )
 
@@ -397,6 +426,7 @@ des auto-load etc. qui permettent des meilleures performances.
               ("TAB" . nil)
               ("œ" . yas-expand))
   :config
+  (use-package yasnippet-snippets)
   (yas-reload-all)
   (dolist (hook '(org-mode-hook
                   fountain-mode-hook
@@ -413,6 +443,7 @@ des auto-load etc. qui permettent des meilleures performances.
          ("C-x a" . org-agenda))
   :config
   ;; Org and writing source code inside org mode
+  (setq org-ellipsis " ▾")
   (setq org-src-fontify-natively t
         org-src-preserve-indentation t
         org-src-tab-acts-natively t)
@@ -581,7 +612,21 @@ Usefull when I want to focus only on the writing.
 	 ("M-a" . counsel-ag)
 	 ("M-é" . counsel-imenu)
 	 ("C-x C-f" . counsel-find-file)
-	 ("M-r" . ivy-resume)))
+	 ("M-r" . ivy-resume)
+     ("C-s" . swiper)
+     :map ivy-minibuffer-map
+     ("TAB" . ivy-alt-done)
+     ("C-l" . ivy-alt-done)
+     ("C-j" . ivy-next-line)
+     ("C-k" . ivy-previous-line)
+     :map ivy-switch-buffer-map
+     ("C-k" . ivy-previous-line)
+     ("C-l" . ivy-done)
+     ("C-d" . ivy-switch-buffer-kill)
+     :map ivy-reverse-i-search-map
+     ("C-k" . ivy-previous-line)
+     ("C-d" . ivy-reverse-i-search-kill))
+  )
 
 (use-package ivy-rich
   :after ivy
