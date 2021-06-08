@@ -99,7 +99,7 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-source .aliasrc
+source $HOME/.aliasrc
 
 export EDITOR='emacs -nw'
 
