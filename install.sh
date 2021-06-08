@@ -32,5 +32,8 @@ do
     echo "Setup $t"
     ln -sb $this_dir/$f $t
 done
+echo "Setup dmenu_aliases"
+ln -s $this_dir/dmenu-scripts-collection/dmenu-recent-aliases/dmenu_recent_aliases $HOME/.config/i3/
+
 
 echo "Done"

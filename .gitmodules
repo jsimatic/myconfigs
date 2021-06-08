@@ -1,0 +1,3 @@
+[submodule "dmenu-scripts-collection"]
+	path = dmenu-scripts-collection
+	url = git@github.com:jsimatic/dmenu-scripts-collection.git
