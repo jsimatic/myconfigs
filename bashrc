@@ -31,7 +31,7 @@ export SVN_EDITOR="emacs -nw"
 export EDITOR="emacs -nw"
 
 # Launch emacs
-emacsclient -ca false -nw -e '(delete-frame)' || /usr/bin/emacs --daemon
+emacsclient -ca false -nw -e '(delete-frame)' || /snap/bin/emacs --daemon
 
 export PATH_ALTERA=/home/jsimatic/softs/intelFPGA/16.1
 export PATH=${PATH}:${PATH_ALTERA}/modelsim_ase/bin

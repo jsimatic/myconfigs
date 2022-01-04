@@ -25,7 +25,7 @@ alias netcut="sudo ip link set wlp2s0 down"
 
 #alias emacs='emacsclient -t'
 alias e='emacsclient -t'
-alias remacs='/usr/bin/emacs --daemon; e'
+alias remacs='/snap/bin/emacs --daemon; e'
 
 # I don't know how to type
 alias eamcs='emacs'
@@ -51,3 +51,5 @@ alias single_monitor='xrandr --output $screen1 --off --output $screen2 --off; sl
 alias dual_monitors='xrandr --output $screen1 --auto --right-of $main'
 alias triple_monitors='xrandr --output $screen2 --auto --right-of $screen1'
 alias steam='./.steam/steam/steam.sh'
+
+alias bat="batcat"

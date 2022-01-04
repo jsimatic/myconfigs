@@ -272,7 +272,8 @@ des auto-load etc. qui permettent des meilleures performances.
   (general-create-definer jsim/leader-keys :prefix "C-x p")
   (jsim/leader-keys
     "s" '(counsel-search :which-key "web search")
-    "r" '(reload-config :which-key "reload config")
+    "cr" '(reload-config :which-key "reload config")
+    "co" '(open-config :which-key "open config")
     "p" '(:ignore t :which-key "projectile")
     "pp" '(counsel-projectile-switch-project :which-key "switch project")
     "pb" '(counsel-projectile-switch-to-buffer :which-key "switch to buffer")
@@ -592,6 +593,10 @@ Usefull when I want to focus only on the writing.
 ** Window / Split management
 *** Enhanced search with ivy-mode (Counsel & Swiper !)
 #+BEGIN_SRC emacs-lisp
+(use-package counsel
+  :ensure t
+  )
+
 (use-package ivy
   :diminish ivy-mode
   :init
