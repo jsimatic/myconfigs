@@ -62,7 +62,7 @@ ZSH_THEME="gnzh"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
     git
-    sudo
+    thefuck
     archlinux
     ssh-agent
     autojump
