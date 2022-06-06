@@ -115,6 +115,8 @@ des auto-load etc. qui permettent des meilleures performances.
       initial-scratch-message nil       ; Clean scratch buffer
       recentf-max-saved-items 100       ; Show more recent files
       ring-bell-function 'ignore        ; Quiet
+      display-line-numbers-type 'relative ; Relative line number
+      show-trailing-whitespace t        ;
       sentence-end-double-space nil)    ; No double space
 
 (dolist (mode
@@ -126,11 +128,21 @@ des auto-load etc. qui permettent des meilleures performances.
            show-paren-mode))            ; Highlight matching parentheses
   (funcall mode 1))
 
-(setq-default fill-column 79                    ; Maximum line width
+(setq-default fill-column 80                    ; Maximum line width
               truncate-lines t                  ; Don't fold lines
               indent-tabs-mode nil              ; Use spaces instead of tabs
               split-width-threshold 100         ; Split verticly by default
               )
+
+;; Disable line numbers for some modes
+(dolist (mode '(org-mode-hook
+                term-mode-hook
+                shell-mode-hook
+                treemacs-mode-hook
+                eshell-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
 (add-to-list 'auto-mode-alist '("\\.ino\\'" . c++-mode))
 
@@ -272,6 +284,7 @@ des auto-load etc. qui permettent des meilleures performances.
   (general-create-definer jsim/leader-keys :prefix "C-x p")
   (jsim/leader-keys
     "s" '(counsel-search :which-key "web search")
+    "c" '(:ignore t :which-key "config")
     "cr" '(reload-config :which-key "reload config")
     "co" '(open-config :which-key "open config")
     "p" '(:ignore t :which-key "projectile")
@@ -336,70 +349,49 @@ des auto-load etc. qui permettent des meilleures performances.
   :config (undo-tree-mode t))
 #+END_SRC
 
-* Editing
-** Terminal
-
-#+BEGIN_SRC emacs-lisp
-(use-package multi-term
-  :ensure t
-  :bind (("C-x M" . multi-term)
-         ("C-x µ" . switch-to-term-mode-buffer))
-  :config
-  (setq multi-term-program "/usr/bin/zsh"
-        term-buffer-maximum-size 10000)
-  ;; ;; Enable compilation-shell-minor-mode in multi term.
-  ;; ;; http://www.masteringemacs.org/articles/2012/05/29/compiling-running-scripts-emacs/
-  (add-hook 'term-mode-hook
-            (lambda ()
-              (dolist
-                  (bind '(("<M-down>" . multi-term)
-                          ("<M-left>" . multi-term-prev)
-                          ("<M-right>" . multi-term-next)
-                          ("C-<backspace>" . term-send-backward-kill-word)
-                          ("C-<delete>" . term-send-forward-kill-word)
-                          ("C-<left>" . term-send-backward-word)
-                          ("C-<right>" . term-send-forward-word)
-                          ("C-c C-j" . term-line-mode)
-                          ("C-c C-k" . term-char-mode)
-                          ("C-v" . scroll-up)
-                          ("C-y" . term-paste)
-                          ("C-z" . term-stop-subjob)
-                          ("M-DEL" . term-send-backward-kill-word)
-                          ("M-d" . term-send-forward-kill-word)))
-                (add-to-list 'term-bind-key-alist bind)))))
-#+END_SRC
-
+* Programming
 ** Various modes -- Autoload fixing
 
 #+BEGIN_SRC emacs-lisp
+(set-fill-column 100)   ;; wrap at 100 character
+(setq-default tab-width 4)
+
 (use-package matlab
   :load-path "~/.emacs.d/lisp"
   :mode ("\\.m$" . matlab-mode))
 
 (use-package markdown-mode
-  :ensure t
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . markdown-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
-  :init (setq markdown-command "multimarkdown"))
+  :init (setq
+         markdown-command "multimarkdown"
+         markdown-enable-math t
+         fill-column 80))
 
+(use-package verilog-mode
+  :mode ("\\.sv\\'" "\\.v\\'" "\\.vh\\'" "\\.svh\\'")
+  :init (setq
+         verilog-auto-newline nil
+         verilog-indent-level 4
+         verilog-indent-level-behavioral 4
+         verilog-indent-level-declaration 4
+         verilog-indent-level-directive 0
+         verilog-indent-level-module 4
+         verilog-auto-delete-trailing-whitespace t))
 
 (use-package anaconda-mode
-  :ensure t
   :hook (python-mode . anaconda-mode)
 )
 
 (use-package spice-mode
-  :ensure t
   :mode ("\\.sp\\'" . spice-mode))
 
 (use-package julia-mode
-  :ensure t
   :mode ("\\.jl\\'" . julia-mode))
 
 (use-package julia-repl
-  :ensure t
   :init (add-hook 'julia-mode-hook 'julia-repl-mode))
 
 (add-to-list 'auto-mode-alist '("\\.make\\'" . makefile-gmake-mode))
@@ -410,12 +402,51 @@ des auto-load etc. qui permettent des meilleures performances.
 
 (add-to-list 'auto-mode-alist '("\\.tikz\\'" . latex-mode))
 (add-to-list 'auto-mode-alist '("\\.tex\\'" . latex-mode))
+#+END_SRC
 
-(use-package jedi
-  :ensure t
-  :init (setq jedi:complete-on-dot t)
-  :init (add-hook 'python-mode 'jedi:ac-setup)
-)
+** Luanguage Server
+
+Use [[https://github.com/suoto/hdl_checker][hdl_checker]]. Install using pip =pip install hdl-checker --upgrade=
+
+#+BEGIN_SRC emacs-lisp
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :hook ((verilog-mode . lsp-deferred)
+         (vhdl-mode . lsp-deferred)
+         (c-mode . lsp-deferred)
+         (c++-mode . lsp-deferred)
+         )
+  :init (setq
+         lsp-keymap-prefix "C-c l"  ;; Or 'C-l', 's-l'
+         lsp-vhdl-server 'hdl-checker
+       )
+  :config
+  (lsp-enable-which-key-integration t)
+  (lsp-register-client
+    (make-lsp-client :new-connection (lsp-tramp-connection "pyls")
+                     :major-modes '(python-mode)
+                     :remote? t
+                     :server-id 'pyls-remote))
+  )
+
+
+(use-package lsp-python-ms
+  :init (setq lsp-python-ms-auto-install-server t)
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-python-ms)
+                         (lsp-deferred))))
+(use-package lsp-jedi
+  :config
+    (with-eval-after-load "lsp-mode"
+    (add-to-list 'lsp-disabled-clients 'pyls)
+    (add-to-list 'lsp-enabled-clients 'jedi)))
+(setq doom-modeline-python-executable "python3")
+
+(use-package lsp-clangd
+  :load-path "lsp-clangd/lsp-clangd.el"
+  :config
+    (with-eval-after-load "lsp-mode"
+    (add-to-list 'lsp-enabled-clients 'clangd)))
 #+END_SRC
 
 ** YASnippet
@@ -514,20 +545,42 @@ des auto-load etc. qui permettent des meilleures performances.
   )
 #+END_SRC
 
-** Word processing
-*** Fountain mode
-#+BEGIN_SRC emacs-lisp
-(use-package fountain-mode
-  :ensure t
-  :commands (draft-mode))
-#+END_SRC
+** Terminal - SSH
 
-*** Draft mode
-Usefull when I want to focus only on the writing.
 #+BEGIN_SRC emacs-lisp
-(use-package draft-mode
+(use-package multi-term
   :ensure t
-  :commands (draft-mode))
+  :bind (("C-x M" . multi-term)
+         ("C-x µ" . switch-to-term-mode-buffer))
+  :config
+  (setq multi-term-program "/usr/bin/zsh"
+        term-buffer-maximum-size 10000)
+  ;; ;; Enable compilation-shell-minor-mode in multi term.
+  ;; ;; http://www.masteringemacs.org/articles/2012/05/29/compiling-running-scripts-emacs/
+  (add-hook 'term-mode-hook
+            (lambda ()
+              (dolist
+                  (bind '(("<M-down>" . multi-term)
+                          ("<M-left>" . multi-term-prev)
+                          ("<M-right>" . multi-term-next)
+                          ("C-<backspace>" . term-send-backward-kill-word)
+                          ("C-<delete>" . term-send-forward-kill-word)
+                          ("C-<left>" . term-send-backward-word)
+                          ("C-<right>" . term-send-forward-word)
+                          ("C-c C-j" . term-line-mode)
+                          ("C-c C-k" . term-char-mode)
+                          ("C-v" . scroll-up)
+                          ("C-y" . term-paste)
+                          ("C-z" . term-stop-subjob)
+                          ("M-DEL" . term-send-backward-kill-word)
+                          ("M-d" . term-send-forward-kill-word)))
+                (add-to-list 'term-bind-key-alist bind)))))
+
+;; Allow edit over SSH
+(use-package tramp
+  :config
+  ;;(setq tramp-verbose 7)
+  )
 #+END_SRC
 
 * Navigation
@@ -556,6 +609,9 @@ Usefull when I want to focus only on the writing.
          :map projectile-mode-map
               ("M-p" . projectile-command-map)
          )
+  :init (setq
+         projectile-file-exists-remote-cache-expire (* 30 60)
+         projectile-enable-caching t)
   :config
   (use-package counsel-projectile
     :ensure t
@@ -737,4 +793,20 @@ can't to bad.
         sr-speedbar-show-unknown-files t
         sr-speedbar-right-side nil)
 )
+#+END_SRC
+
+** Word processing
+*** Fountain mode
+#+BEGIN_SRC emacs-lisp :tangle no
+(use-package fountain-mode
+  :ensure t
+  :commands (draft-mode))
+#+END_SRC
+
+*** Draft mode
+Usefull when I want to focus only on the writing.
+#+BEGIN_SRC emacs-lisp :tangle no
+(use-package draft-mode
+  :ensure t
+  :commands (draft-mode))
 #+END_SRC

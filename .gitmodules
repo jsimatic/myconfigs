@@ -1,3 +1,6 @@
 [submodule "dmenu-scripts-collection"]
 	path = dmenu-scripts-collection
 	url = git@github.com:jsimatic/dmenu-scripts-collection.git
+[submodule "emacs.d/lsp-clangd"]
+	path = emacs.d/lsp-clangd
+	url = git@github.com:gregnwosu/lsp-clangd.git
