@@ -35,5 +35,7 @@ done
 echo "Setup dmenu_aliases"
 ln -s $this_dir/dmenu-scripts-collection/dmenu-recent-aliases/dmenu_recent_aliases $HOME/.config/i3/
 
+echo "Installing pip packages"
+pip3 install hdl_checker thefuck
 
 echo "Done"
